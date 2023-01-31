@@ -1,0 +1,9 @@
+#{{ ansible_managed }}
+<VirtualHost	{{ ansible_fqdn }}:{{ apache_http_port }}>
+	ServerName {{ ansible_hostname }}:{{ apache_http_port }}
+	DocumentRoot /var/www/html/
+	<Directory	"/var/www//html/">
+		AllowOverride none
+		Require all granted
+	</Directory>
+</Virtualhost>

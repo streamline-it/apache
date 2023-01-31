@@ -1,0 +1,12 @@
+#{{ ansible_managed }}
+<VirtualHost	{{ apache_webserver_name }}:{{ apache_http_port }}>
+	ServerName {{ apache_webserver_name }}:{{ apache_http_port }}
+	ServerAdmin sa@{{ apache_webserver_name }}
+	CustomLog logs/{{ apache_webserver_name }}_access.log combined
+	ErrorLog logs/{{ apache_webserver_name }}_error.log
+	DocumentRoot {{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/
+	<Directory	"{{ apache_virtual_hosts_directory}}/{{ apache_webserver_name }}/html/">
+		AllowOverride none
+		Require all granted
+	</Directory>
+</Virtualhost>
