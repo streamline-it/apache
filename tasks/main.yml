@@ -1,0 +1,66 @@
+---
+# tasks file for apache
+- name: call tasks to make sure needed packages are installed
+  ansible.builtin.include_tasks: "./tasks/install_{{ ansible_os_family }}_pkgs.yml"
+  when: apache_operation == "deploy"
+
+- name: make sure virtual hosts directory exists
+  ansible.builtin.file:
+    path: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html"
+    owner: root
+    group: apache
+    mode: "0750"
+    state: directory
+  when: apache_operation == "deploy"
+
+- name: make sure default webserver's content exists
+  ansible.builtin.template:
+    src: ./templates/default_webserver_index.html.j2
+    dest: "{{ apache_default_webcontent_directory }}/index.html"
+    owner: root
+    group: apache
+    mode: "0640"
+    force: true
+  notify: restart webserver
+  when: apache_operation == "deploy"
+
+- name: make sure virtual webserver's content exists
+  ansible.builtin.template:
+    src: ./templates/virtual_webserver_index.html.j2
+    dest: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/index.html"
+    owner: root
+    group: apache
+    force: true
+    mode: "0640"
+  notify: restart webserver
+  when: apache_operation == "deploy"
+
+- name: make sure needed default configuration has been setup
+  ansible.builtin.template:
+    src: ./templates/0000_default_config.conf.j2
+    dest: "{{ apache_config_directory }}/0000_default_config.conf"
+    mode: "0600"
+    owner: root
+    force: true
+    group: apache
+  notify: restart webserver
+  when: apache_operation == "deploy"
+
+- name: make sure needed webserver configuration has been setup
+  ansible.builtin.template:
+    src: ./templates/0010_config.conf.j2
+    dest: "{{ apache_config_directory }}/0010_config.conf"
+    mode: "0600"
+    owner: root
+    group: apache
+    force: true
+  notify: restart webserver
+  when: apache_operation == "deploy"
+
+- name: call tasks make sure needed services are enabled/started
+  ansible.builtin.include_tasks: "./tasks/start_{{ ansible_os_family }}_svc.yml"
+  when: apache_operation == "deploy"
+
+- name: call task to restart webserver
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}_restart_websvc.yml"
+  when: apache_operation == "restart"

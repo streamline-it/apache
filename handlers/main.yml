@@ -1,0 +1,4 @@
+---
+# handlers file for apache
+- name: restart webserver
+  include_tasks: "{{ ansible_os_family }}_restart_websvc.yml"
