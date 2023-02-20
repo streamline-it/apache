@@ -1,0 +1,18 @@
+#{{ ansible_managed }}
+<VirtualHost	{{ apache_webserver_name }}:{{ apache_https_port }}>
+	ServerName {{ apache_webserver_name }}:{{ apache_https_port }}
+	ServerAdmin sa@{{ apache_webserver_name }}
+	CustomLog logs/{{ apache_webserver_name }}_access.log combined
+	ErrorLog logs/{{ apache_webserver_name }}_error.log
+	DocumentRoot {{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/
+	SSLEngine on
+	SSLCertificateFile {{ apache_cert_destination }}/{{ apache_webserver_name }}.crt
+	SSLCertificateKeyFile {{ apache_key_destination }}/{{ apache_webserver_name }}.key
+	SSLHonorCipherOrder on
+	SSLProtocol ALL -SSLv2 -SSLv3
+	SSLCipherSuite HIGH:MEDIUM:!NULL:!MD5
+	<Directory	{{ apache_virtual_hosts_directory}}/{{ apache_webserver_name }}/html/>
+		AllowOverride none
+		Require all granted
+	</Directory>
+</Virtualhost>

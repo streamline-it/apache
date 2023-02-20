@@ -5,6 +5,8 @@
 	CustomLog logs/{{ apache_webserver_name }}_access.log combined
 	ErrorLog logs/{{ apache_webserver_name }}_error.log
 	DocumentRoot {{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/
+	RewriteEngine on
+	RewriteRule ^(/.*)$ https://%{HTTP_HOST}$1 [redirect=301]
 	<Directory	"{{ apache_virtual_hosts_directory}}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
