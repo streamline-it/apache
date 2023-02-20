@@ -34,6 +34,12 @@ apache_default_webcontent_directory: /var/www/html
 # Directory to use for the config files
 apache_config_directory: /etc/httpd/conf.d
 
+# Certificate file path
+apache__certificate_file_path: "/files/{{ apache_webserver_name }}.crt"
+
+# Certificate key file path
+apache_certificate_key_file_path: "./files/{{ apach_webserver_name }}.key"
+
 Dependencies
 ------------
 

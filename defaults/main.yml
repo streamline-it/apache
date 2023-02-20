@@ -7,3 +7,5 @@ apache_https_port: 443
 apache_virtual_hosts_directory: /var/www/virtual_hosts
 apache_default_webcontent_directory: /var/www/html
 apache_config_directory: /etc/httpd/conf.d
+apache_certificate_file_path: "./files/{{ apache_webserver_name }}.crt"
+apache_certificate_key_file_path: "./files/{{ apache_webserver_name }}.key"

@@ -46,10 +46,25 @@
   notify: restart webserver
   when: apache_operation == "deploy"
 
+- name: call task to make sure certificate file is copied to the host
+  ansible.builtin.include_tasks: "./tasks/copy_cert_and_key_files.yml"
+  when: apache_operation == "deploy"
+  
 - name: make sure needed webserver configuration has been setup
   ansible.builtin.template:
     src: ./templates/0010_config.conf.j2
     dest: "{{ apache_config_directory }}/0010_config.conf"
+    mode: "0600"
+    owner: root
+    group: apache
+    force: true
+  notify: restart webserver
+  when: apache_operation == "deploy"
+
+- name: make sure needed webserver SSL configuration has been setup
+  ansible.builtin.template:
+    src: ./templates/0015_config.conf.j2
+    dest: "{{ apache_config_directory }}/0015_config.conf"
     mode: "0600"
     owner: root
     group: apache
