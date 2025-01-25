@@ -1,7 +1,7 @@
 ---
 - name: make sure apache package is installed (via dnf)
   ansible.builtin.dnf:
-    name: "@Basic Web Server"
+    name: "{{ apache_pkg }}"
     update_cache: true
     state: latest
   when: ansible_distribution_major_version == "8"
@@ -9,7 +9,7 @@
 
 - name: make sure apache package is installed (via yum)
   ansible.builtin.yum:
-    name: "@Basic Web Server"
+    name: "{{ aoache_pkg}}"
     update_cache: true
     state: latest
   when: ansible_distribution_major_version == "6"

@@ -1,0 +1,22 @@
+---
+apache_enable_directive: apache24_enable="yes"
+
+apache_group: www
+apache_pkg: apache24
+apache_web_svc: apache24
+
+apache_virtual_hosts_directory: "{{ apache_jail_prepath }}/usr/local/www/virtual_hosts"
+apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/html
+apache_virtual_host_webcontent_directory_relative: /usr/local/www/virtual_hosts/apache_webserver_name/html
+apache_default_webcontent_directory: "{{ apache_jail_prepath }}/usr/local/www/apache24/data/html"
+apache_config_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24/conf.d"
+apache_certificate_file_path: "./files/{{ apache_webserver_name }}.crt"
+apache_cert_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+apache_certificate_key_filepath: "./files/{{ apache_webserver_name }}.key"
+apache_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}"
+
+apache_create_cert_commands:
+  - cmd: "openssl genpkey -algorithm RSA -out {{ apache_webserver_name }}.key"
+  - cmd: "openssl req -new -key test.com.key -out {{ apache_webserver_name }}.csr"
+  - cmd: "openssl x509 -req -days 365 -in {{ apache_webserver_name }}.csr -signkey {{ apache_webserver_name }}.key -out {{ apache_webserver_name }}.crt"
+

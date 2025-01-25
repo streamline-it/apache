@@ -1,0 +1,17 @@
+---
+- name: ensure certificates are created
+  when: ansible_os_family == "RedHat"
+  loop:
+    "{{ apache_create_cert_commands }}"
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+
+- name: ensure certificate file are correctly setup with user/group permissions
+  loop:
+    - "{{ apache_cert_destination_filepath }}"
+    - "{{ apache_key_destination_filepath }}"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+    group: "{{ apache_group }}"
+    mode: "0650"
