@@ -1,5 +1,9 @@
 ---
 # tasks file for apache
+- name: ensure OS specific variables exists
+  ansible.builtin.include_vars:
+    "vars/{{ ansible_os_family }}_vars.yml"
+
 - name: call tasks to make sure needed packages are installed
   ansible.builtin.include_tasks: "./tasks/install_{{ ansible_os_family }}_pkgs.yml"
   when: apache_operation == "deploy"
@@ -12,6 +16,22 @@
     mode: "0750"
     state: directory
   when: apache_operation == "deploy"
+
+- name: ensure httpd file is modified
+  when: apache_httpd_conf_lines[0]['line'] is defined
+  loop:
+    "{{ apache_httpd_conf_lines }}"
+  ansible.builtin.lineinfile:
+    path: "{{ apache_config_base_directory }}/httpd.conf"
+    line: "{{ item['line'] }}"
+    state: present
+
+- name: ensure webcontent directory exists for the virual host
+  ansible.builtin.file:
+    path: "{{ apache_virtual_hosts_webcontent_directory }}"
+    owner: root
+    group: "{{ apache_group }}"
+    state: directory
 
 - name: make sure default webserver's content exists
   ansible.builtin.template:
@@ -30,10 +50,18 @@
     dest: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/index.html"
     owner: root
     group: "{{ apache_group  }}"
-    force: true
+    force: false
     mode: "0640"
   notify: restart webserver
   when: apache_operation == "deploy"
+
+- name: ensure config directory exists
+  ansible.builtin.file:
+    path: "{{ apache_config_directory }}"
+    owner: root
+    group: "{{ apache_root_group }}"
+    mode: "0755"
+    state: directory
 
 - name: make sure needed default configuration has been setup
   ansible.builtin.template:
@@ -43,7 +71,6 @@
     owner: root
     group: "{{ apache_group }}"
     force: true
-    group: "{{ apache_group }}"
   notify: restart webserver
   when: apache_operation == "deploy"
 
@@ -51,10 +78,15 @@
   ansible.builtin.include_tasks: "./tasks/create_cert_and_key_files.yml"
   when: apache_operation == "deploy"
   
-- name: make sure needed webserver configuration has been setup
+- name: call task to setup host's certificate/key files are setup
+  when: ansible_os_family == "FreeBSD"
+  ansible.builtin.include_tasks: "./tasks/config_main_host_certs_{{ ansible_os_family }}.yml"
+
+- name: make sure needed webserver virtual hosts configuration has been setup (RHEL)
+  when: ansible_os_family == "RedHat"
   ansible.builtin.template:
     src: ./templates/0010_config.conf.j2
-    dest: "{{ apache_config_directory }}/0010_config.conf"
+    dest: "{{ apache_config_directory }}/0010_vhosts.conf"
     mode: "0600"
     owner: root
     group: "{{ apache_group }}"
@@ -62,16 +94,16 @@
   notify: restart webserver
   when: apache_operation == "deploy"
 
-- name: make sure needed webserver SSL configuration has been setup
+- name: make sure needed webserver virtual hosts configuration has been setup (FreeBSD)
+  when: ansible_os_family == "FreeBSD" and apache_operation == "deploy"
+  notify: restart webserver
   ansible.builtin.template:
-    src: ./templates/0015_config.conf.j2
-    dest: "{{ apache_config_directory }}/0015_config.conf"
+    src: ./templates/0010_config.conf.j2
+    dest: "{{ apache_config_virt_hosts_filepath }}/0010_vhosts.conf"
     mode: "0600"
     owner: root
     group: "{{ apache_group }}"
     force: true
-  notify: restart webserver
-  when: apache_operation == "deploy"
 
 - name: call tasks make sure needed services are enabled/started
   ansible.builtin.include_tasks: "./tasks/start_{{ ansible_os_family }}_svc.yml"

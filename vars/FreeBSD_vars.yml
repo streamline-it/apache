@@ -1,22 +1,37 @@
 ---
 apache_enable_directive: apache24_enable="yes"
+apache_root_group: wheel
 
 apache_group: www
 apache_pkg: apache24
-apache_web_svc: apache24
+apache_openssl_pkg: openssl
+
+apache_svc: apache24
 
 apache_virtual_hosts_directory: "{{ apache_jail_prepath }}/usr/local/www/virtual_hosts"
-apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/html
-apache_virtual_host_webcontent_directory_relative: /usr/local/www/virtual_hosts/apache_webserver_name/html
-apache_default_webcontent_directory: "{{ apache_jail_prepath }}/usr/local/www/apache24/data/html"
-apache_config_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24/conf.d"
-apache_certificate_file_path: "./files/{{ apache_webserver_name }}.crt"
+apache_virtual_hosts_directory_relative: "/usr/local/www/virtual_hosts"
+apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/
+apache_virtual_hosts_webcontent_directory: "{{ apache_jail_prepath }}/var/www/virtual_hosts/{{ apache_webserver_name }}/data"
+apache_virtual_hosts_webcontent_directory_relative: "/usr/local/www/virtual_hosts/{{ apache_webserver_name }}/data"
+apache_default_webcontent_directory: "{{ apache_jail_prepath }}/usr/local/www/apache24/data/"
+apache_default_webcontent_directory_relative: "/usr/local/www/apache24/data/"
+apache_config_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
+apache_config_base_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24"
+apache_config_virt_hosts_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
 apache_cert_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
-apache_certificate_key_filepath: "./files/{{ apache_webserver_name }}.key"
-apache_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}"
+apache_cert_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+apache_cert_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
+apache_cert_key_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
 
 apache_create_cert_commands:
-  - cmd: "openssl genpkey -algorithm RSA -out {{ apache_webserver_name }}.key"
-  - cmd: "openssl req -new -key test.com.key -out {{ apache_webserver_name }}.csr"
-  - cmd: "openssl x509 -req -days 365 -in {{ apache_webserver_name }}.csr -signkey {{ apache_webserver_name }}.key -out {{ apache_webserver_name }}.crt"
+  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt -days 365 -nodes -subj '{{ apache_cert_subj}}'"
+    certfile: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.crt -days 365 -nodes -subj '{{ apache_main_host_subj}}'"
+    certfile: "/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"
 
+apache_httpd_conf_lines:
+  - line: LoadModule ssl_module libexec/apache24/mod_ssl.so
+  - line: LoadModule socache_shmcb_module libexec/apache24/mod_socache_shmcb.so
+  - line: LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+  - line: LoadModule vhost_alias_module libexec/apache24/mod_vhost_alias.so
+  - line: Include etc/apache24/extra/httpd-ssl.conf

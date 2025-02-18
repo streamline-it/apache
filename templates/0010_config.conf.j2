@@ -2,13 +2,29 @@
 <VirtualHost	{{ apache_webserver_name }}:{{ apache_http_port }}>
 	ServerName {{ apache_webserver_name }}:{{ apache_http_port }}
 	ServerAdmin sa@{{ apache_webserver_name }}
-	CustomLog logs/{{ apache_webserver_name }}_access.log combined
-	ErrorLog logs/{{ apache_webserver_name }}_error.log
+	CustomLog /var/log/{{ apache_webserver_name }}_access.log combined
+	ErrorLog /var/log/{{ apache_webserver_name }}_error.log
 	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
-	RewriteEngine on
-	RewriteRule ^(/.*)$ https://%{HTTP_HOST}$1 [redirect=301]
+	#RewriteEngine on
+	#RewriteRule ^(/.*)$ https://%{HTTP_HOST}$1 [redirect=301]
 	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
 	</Directory>
 </Virtualhost>
+{% if apache_secure_it == true %}
+<VirtualHost	{{ apache_webserver_name }}:{{ apache_https_port }}>
+	ServerName {{ apache_webserver_name }}:{{ apache_https_port }}
+	ServerAdmin sa@{{ apache_webserver_name }}
+	CustomLog /var/log/secure_{{ apache_webserver_name }}_access.log combined
+	ErrorLog /var/log/secure_{{ apache_webserver_name }}_error.log
+	SSLEngine on
+	SSLCertificateFile {{ apache_cert_destination_relative_filepath }}
+	SSLCertificateKeyFile {{ apache_cert_key_destination_relative_filepath }}
+	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
+	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
+		AllowOverride none
+		Require all granted
+	</Directory>
+</Virtualhost>
+{% endif %}

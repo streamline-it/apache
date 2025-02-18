@@ -1,34 +1,35 @@
 ---
-- nave: make sure service is enabled for the host
+- name: make sure service is enabled for the host
   when: apache_jail_it == false
   community.general.sysrc:
     name: "{{ apache_svc }}"
     value: "yes"
     state: present
 
-- nave: make sure service is enabled for the jail
+- name: make sure service is enabled for the jail
   when: apache_jail_it == true
   community.general.sysrc:
-    name: "{{ apache_svc }}"
+    name: "{{ apache_svc }}_enable"
     value: "yes"
     jail: "{{ apache_jailname }}"
     state: present
 
-- name: ensure the service is started for the host
+- name: ensure the service is started for the host *** ignore errors enabled - test mode ***
   when: apache_jail_it == false
+  ignore_errors: true
   ansible.builtin.service:
-    name: "{{ apache_web_svc }}"
+    name: "{{ apache_svc }}"
     enabled: true
     state: started
 
 - name: check if the service is started for the jail
   when: apache_jail_it == true
+  ignore_errors: true
   register: jail_svc_status
   ansible.builtin.command:
-    cmd: service -j "{{ apache_jailname }}" "{{ apache_web_svc }}" status
+    cmd: service -j "{{ apache_jailname }}" "{{ apache_svc }}" status
 
 - name: ensure the service is started if it's not running in the jail
-  debugger: on_failed
-  when : apache_jail_it == true and jail_svc_status['results']['stdout'] == "apache24 is not running"
+  when : apache_jail_it == true and jail_svc_status['stdout'] == "apache24 is not running."
   ansible.builtin.command:
-    cmd: service -j "{{ apache_jailname }}" "{{ apache_web_svc }}" start
+    cmd: service -j "{{ apache_jailname }}" "{{ apache_svc }}" start

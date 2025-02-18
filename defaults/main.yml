@@ -3,6 +3,12 @@
 apache_operation: deploy
 apache_webserver_name: int_webserver
 
+# If true SSL will be enabled
+apache_secure_it: true
+
+# Used to set the main host's certification filename etc
+apache_main_hostname: 
+
 apache_jail_it: false
 
 # leave next two variables blank unless installing in jail
@@ -11,5 +17,5 @@ apache_jail_prepath:
 
 apache_http_port: 80
 apache_https_port: 443
-apache_certificate_file_path: "./files/{{ apache_webserver_name }}.crt"
-apache_certificate_key_file_path: "./files/{{ apache_webserver_name }}.key"
+
+apache_cert_subj: "/C=US/ST=California/L=SanFrancisco/O=MyCompany/OU=IT/CN=mydomain.com"

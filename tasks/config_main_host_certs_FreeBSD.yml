@@ -1,0 +1,14 @@
+---
+- name: Configure main host's cert path
+  ansible.builtin.lineinfile:
+    path: "{{ apache_jail_prepath }}/usr/local/etc/apache24/extra/httpd-ssl.conf"
+    regex: 'SSLCertificateFile "/usr/local/etc/apache24/server.crt"'
+    line: 'SSLCertificateFile "/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"'
+    state: present
+
+- name: Configure main host's cert key path
+  ansible.builtin.lineinfile:
+    path: "{{ apache_jail_prepath }}/usr/local/etc/apache24/extra/httpd-ssl.conf"
+    regex: 'SSLCertificateKeyFile "/usr/local/etc/apache24/server.key"'
+    line: 'SSLCertificateKeyFile "/usr/local/etc/apache24/{{ apache_main_hostname }}.key"'
+    state: present

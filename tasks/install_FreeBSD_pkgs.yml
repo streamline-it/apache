@@ -1,0 +1,25 @@
+---
+- name: make sure apache package is installed on host
+  when: apache_jail_it == false
+  community.general.pkgng:
+    name: "{{ apache_pkg }}"
+    state: present
+
+- name: make sure openssl package is installed on host
+  when: apache_jail_it == false
+  community.general.pkgng:
+    name: "{{ apache_openssl_pkg }}"
+    state: present
+
+- name: make sure apache package is installed in jail
+  when: apache_jail_it == true
+  community.general.pkgng:
+    name: "{{ apache_pkg }}"
+    jail: "{{ apache_jailname }}"
+    state: present
+
+- name: make sure openssl package is installed in jail
+  when: apache_jail_it == true
+  community.general.pkgng:
+    name: "{{ apache_openssl_pkg }}"
+    state: present
