@@ -1,6 +1,5 @@
 ---
 - name: make sure default webserver's content exists
-  when: apache_operation == "deploy"
   notify: restart webserver
   ansible.builtin.template:
     src: ./templates/default_webserver_index.html.j2
@@ -18,7 +17,6 @@
     state: directory
 
 - name: make sure virtual webserver's content exists
-  when: apache_operation == "deploy"
   notify: restart webserver
   ansible.builtin.template:
     src: ./templates/virtual_webserver_index.html.j2
@@ -26,4 +24,4 @@
     owner: root
     group: "{{ apache_group  }}"
     force: false
-    mode: "0640"-
+    mode: "0640"
