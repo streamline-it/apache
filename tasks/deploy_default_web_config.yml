@@ -1,0 +1,19 @@
+---
+- name: ensure config directory exists
+  ansible.builtin.file:
+    path: "{{ apache_config_directory }}"
+    owner: root
+    group: "{{ apache_root_group }}"
+    mode: "0755"
+    state: directory
+
+ name: make sure needed default configuration has been setup
+  when: apache_operation == "deploy"
+  notify: restart webserver
+  ansible.builtin.template:
+    src: ./templates/0000_default_config.conf.j2
+    dest: "{{ apache_config_directory }}/0000_default_config.conf"
+    mode: "0600"
+    owner: root
+    group: "{{ apache_group }}"
+    force: true

@@ -1,0 +1,22 @@
+---
+- name: make sure needed webserver virtual hosts configuration has been setup (RHEL)
+  when: ansible_os_family == "RedHat" and apache_operation == "deploy"
+  notify: restart webserver
+  ansible.builtin.template:
+    src: ./templates/0010_config.conf.j2
+    dest: "{{ apache_config_directory }}/0010_vhosts.conf"
+    mode: "0600"
+    owner: root
+    group: "{{ apache_group }}"
+    force: true
+
+- name: make sure needed webserver virtual hosts configuration has been setup (FreeBSD)
+  when: ansible_os_family == "FreeBSD" and apache_operation == "deploy"
+  notify: restart webserver
+  ansible.builtin.template:
+    src: ./templates/0010_config.conf.j2
+    dest: "{{ apache_config_virt_hosts_filepath }}/0010_vhosts.conf"
+    mode: "0600"
+    owner: root
+    group: "{{ apache_group }}"
+    force: true

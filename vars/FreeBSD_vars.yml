@@ -1,13 +1,20 @@
 ---
+# Used to enable service in the rc.conf file
 apache_enable_directive: apache24_enable="yes"
+# used for root user under FreeBSD
 apache_root_group: wheel
 
+# used for the group for apache
 apache_group: www
 apache_pkg: apache24
 apache_openssl_pkg: openssl
 
+# needed for the service "start" 
 apache_svc: apache24
 
+# All "relative" variables contain the "inside jail" path that usually is used for
+# config lines.  If not running the webserver from a jail, make the relative value
+# the save as the variable above it.
 apache_virtual_hosts_directory: "{{ apache_jail_prepath }}/usr/local/www/virtual_hosts"
 apache_virtual_hosts_directory_relative: "/usr/local/www/virtual_hosts"
 apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/
@@ -23,12 +30,14 @@ apache_cert_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_we
 apache_cert_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
 apache_cert_key_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
 
+# used to create the certificates and cert keys
 apache_create_cert_commands:
   - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt -days 365 -nodes -subj '{{ apache_cert_subj}}'"
     certfile: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
   - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.crt -days 365 -nodes -subj '{{ apache_main_host_subj}}'"
     certfile: "/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"
 
+# used to add needed directives to the httpd.conf file in order to enable Rewrite and Secure SSL connections
 apache_httpd_conf_lines:
   - line: LoadModule ssl_module libexec/apache24/mod_ssl.so
   - line: LoadModule socache_shmcb_module libexec/apache24/mod_socache_shmcb.so

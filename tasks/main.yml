@@ -5,17 +5,17 @@
     "vars/{{ ansible_os_family }}_vars.yml"
 
 - name: call tasks to make sure needed packages are installed
-  ansible.builtin.include_tasks: "./tasks/install_{{ ansible_os_family }}_pkgs.yml"
   when: apache_operation == "deploy"
+  ansible.builtin.include_tasks: "./tasks/install_{{ ansible_os_family }}_pkgs.yml"
 
 - name: make sure virtual hosts directory exists
+  when: apache_operation == "deploy"
   ansible.builtin.file:
     path: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html"
     owner: root
     group: "{{ apache_group }}"
     mode: "0750"
     state: directory
-  when: apache_operation == "deploy"
 
 - name: ensure httpd file is modified
   when: apache_httpd_conf_lines[0]['line'] is defined
@@ -26,84 +26,25 @@
     line: "{{ item['line'] }}"
     state: present
 
-- name: ensure webcontent directory exists for the virual host
-  ansible.builtin.file:
-    path: "{{ apache_virtual_hosts_webcontent_directory }}"
-    owner: root
-    group: "{{ apache_group }}"
-    state: directory
-
-- name: make sure default webserver's content exists
-  ansible.builtin.template:
-    src: ./templates/default_webserver_index.html.j2
-    dest: "{{ apache_default_webcontent_directory }}/index.html"
-    owner: root
-    group: "{{ apache_group }}"
-    mode: "0640"
-    force: true
-  notify: restart webserver
+- name: call tasks to make sure web content exists
   when: apache_operation == "deploy"
+  ansible.builtin.include_tasks: "./tasks/deploy_web_content.yml"
 
-- name: make sure virtual webserver's content exists
-  ansible.builtin.template:
-    src: ./templates/virtual_webserver_index.html.j2
-    dest: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/html/index.html"
-    owner: root
-    group: "{{ apache_group  }}"
-    force: false
-    mode: "0640"
-  notify: restart webserver
+- name: ensure default webserver's config exists
   when: apache_operation == "deploy"
-
-- name: ensure config directory exists
-  ansible.builtin.file:
-    path: "{{ apache_config_directory }}"
-    owner: root
-    group: "{{ apache_root_group }}"
-    mode: "0755"
-    state: directory
-
-- name: make sure needed default configuration has been setup
-  ansible.builtin.template:
-    src: ./templates/0000_default_config.conf.j2
-    dest: "{{ apache_config_directory }}/0000_default_config.conf"
-    mode: "0600"
-    owner: root
-    group: "{{ apache_group }}"
-    force: true
-  notify: restart webserver
-  when: apache_operation == "deploy"
+  ansible.builtin.include_tasks: "./tasks/deploy_default_web_config.yml"
 
 - name: call task to create certificates
-  ansible.builtin.include_tasks: "./tasks/create_cert_and_key_files.yml"
   when: apache_operation == "deploy"
+  ansible.builtin.include_tasks: "./tasks/create_cert_and_key_files.yml"
   
 - name: call task to setup host's certificate/key files are setup
   when: ansible_os_family == "FreeBSD"
   ansible.builtin.include_tasks: "./tasks/config_main_host_certs_{{ ansible_os_family }}.yml"
 
-- name: make sure needed webserver virtual hosts configuration has been setup (RHEL)
-  when: ansible_os_family == "RedHat"
-  ansible.builtin.template:
-    src: ./templates/0010_config.conf.j2
-    dest: "{{ apache_config_directory }}/0010_vhosts.conf"
-    mode: "0600"
-    owner: root
-    group: "{{ apache_group }}"
-    force: true
-  notify: restart webserver
+- name: call tasks to deploy virtual host config
   when: apache_operation == "deploy"
-
-- name: make sure needed webserver virtual hosts configuration has been setup (FreeBSD)
-  when: ansible_os_family == "FreeBSD" and apache_operation == "deploy"
-  notify: restart webserver
-  ansible.builtin.template:
-    src: ./templates/0010_config.conf.j2
-    dest: "{{ apache_config_virt_hosts_filepath }}/0010_vhosts.conf"
-    mode: "0600"
-    owner: root
-    group: "{{ apache_group }}"
-    force: true
+  ansible.builtin.include_tasks: "./tasks/deploy_virtual_hosts_config.yml"
 
 - name: call tasks make sure needed services are enabled/started
   ansible.builtin.include_tasks: "./tasks/start_{{ ansible_os_family }}_svc.yml"

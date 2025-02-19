@@ -1,21 +1,27 @@
 ---
 # defaults file for apache
 apache_operation: deploy
+
+# name of the webserver virtual host
 apache_webserver_name: int_webserver
 
 # If true SSL will be enabled
 apache_secure_it: true
 
-# Used to set the main host's certification filename etc
+# main web host, used to set the main host's certification filename etc
 apache_main_hostname: 
 
 apache_jail_it: false
 
 # leave next two variables blank unless installing in jail
 apache_jailname: 
+
+# path to pre-pend to the inside jail path.  Leave blank if not configuring
+# a jail
 apache_jail_prepath:
 
 apache_http_port: 80
 apache_https_port: 443
 
+# Used to create the certificates
 apache_cert_subj: "/C=US/ST=California/L=SanFrancisco/O=MyCompany/OU=IT/CN=mydomain.com"
