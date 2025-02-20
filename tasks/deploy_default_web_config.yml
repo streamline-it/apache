@@ -7,7 +7,7 @@
     mode: "0755"
     state: directory
 
- name: make sure needed default configuration has been setup
+- name: make sure needed default configuration has been setup
   when: apache_operation == "deploy"
   notify: restart webserver
   ansible.builtin.template:
