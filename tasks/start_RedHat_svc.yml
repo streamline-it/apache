@@ -6,7 +6,7 @@
 
 - name: make sure service is enabled/started (service)
   ansible.builtin.service:
-    name: {{ apache_svc }}"
+    name: "{{ apache_svc }}"
     enbled: true
     state: started
   when: ansible_distribution_major_version == "6"
