@@ -176,3 +176,6 @@ apache_httpd_conf_lines:
 # this variable will be used to make sure that page can be viewed 
 apache_webpage_validation:
   - webpage_url:
+
+# This host will be used to run the uri module via the "delegate_to" attribute
+apache_validate_delegate_host:

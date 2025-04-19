@@ -1,7 +1,7 @@
 ---
 - name: validate targeted webpages
   when: apache_webpage_validate is defined
-  delegate_to: localhost
+  delegate_to: "apache_validate_delegate_host"
   loop:
     "{{ apache_webpage_validation }}"
   ansible.builtin.uri:
