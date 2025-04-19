@@ -53,3 +53,6 @@
 - name: call task to restart webserver
   ansible.builtin.include_tasks: "{{ ansible_os_family }}_restart_websvc.yml"
   when: apache_operation == "restart"
+
+- name: call task to ensure webserver content is reachable
+  ansible.builtin.include_tasks: "validate_webserver.yml"

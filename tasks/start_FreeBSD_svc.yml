@@ -1,4 +1,9 @@
 ---
+- name: ensure needed variables are defined before enabling/staring service 
+  ansible.builtin.assert:
+    that: apache_svc is defined
+    fail_msg: "Make sure apache_svc is defined"
+
 - name: make sure service is enabled for the host
   when: apache_jail_it == false
   community.general.sysrc:

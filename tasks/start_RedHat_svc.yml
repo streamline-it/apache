@@ -1,14 +1,19 @@
 ---
+- name: ensure variables are defined before enabling/starting service
+  ansible.builtin.assert:
+    that: apache_svc is defined
+    fail_msg: "Make sure to define apache_svc."
+
 - name: make sure service is enabled/started (service)
   ansible.builtin.service:
-    name: httpd
+    name: {{ apache_svc }}"
     enbled: true
     state: started
   when: ansible_distribution_major_version == "6"
        
 - name: make sure service is enabled/started (systemd)
   ansible.builtin.systemd:
-    name: httpd
+    name: "{{ apache_svc }}"
     enabled: true
     state: started
   when: ansible_distribution_major_version == "7" 

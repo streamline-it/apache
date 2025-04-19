@@ -25,3 +25,8 @@ apache_https_port: 443
 
 # Used to create the certificates
 apache_cert_subj: "/C=US/ST=California/L=SanFrancisco/O=MyCompany/OU=IT/CN=mydomain.com"
+
+# list webpages to validate 
+# this variable will be used to make sure that page can be viewed 
+apache_webpage_validation:
+  - webpage_url:

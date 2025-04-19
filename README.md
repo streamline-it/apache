@@ -171,3 +171,8 @@ apache_httpd_conf_lines:
   - line: LoadModule rewrite_module libexec/apache24/mod_rewrite.so
   - line: LoadModule vhost_alias_module libexec/apache24/mod_vhost_alias.so
   - line: Include etc/apache24/extra/httpd-ssl.conf
+
+# list webpages to validate 
+# this variable will be used to make sure that page can be viewed 
+apache_webpage_validation:
+  - webpage_url:

@@ -1,0 +1,10 @@
+---
+- name: validate targeted webpages
+  when: apache_webpage_validate is defined
+  delegate_to: localhost
+  loop:
+    "{{ apache_webpage_validation }}"
+  ansible.builtin.uri:
+    url: "{{ item['webpage_url'] }}"
+    validate_certs: false
+    status_code: 200
