@@ -29,7 +29,10 @@
 
 - name: check if the service is started for the jail
   when: apache_jail_it == true
-  ignore_errors: true
+  changed_when: false
+  failed_when: >
+    jail_svc_status['rc'] > 0 and
+    jail_svc_status['rc'] != 1
   register: jail_svc_status
   ansible.builtin.command:
     cmd: service -j "{{ apache_jailname }}" "{{ apache_svc }}" status

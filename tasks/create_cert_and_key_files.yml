@@ -1,6 +1,20 @@
 ---
+- name: check to see if certificates exist
+  register: apache_main_host_certificate_check
+  ansible.builtin.stat:
+    path: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"
+    get_attributes: true
+    
+- name: check to see if virtual host's certificates exist
+  register: apache_webserver_certificate_check
+  ansible.builtin.stat:
+    path: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+    get_attributes: true
+
 - name: ensure certificates are created
-  debugger: on_failed
+  when: >
+    apache_main_host_certificate_check['stat']['exists'] == false or
+    apache_webserver_certificate_check['stat']['exists'] == false
   loop:
     "{{ apache_create_cert_commands }}"
   ansible.builtin.shell: "{{ item['command'] }}"
