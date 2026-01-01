@@ -11,7 +11,7 @@
 		AllowOverride none
 		Require all granted
 	</Directory>
-{% if apache_create_web_directories == true %}
+{% if apache_create_custom_web_directories == true %}
 {% for item in apache_web_directories %}
 	<Directory	"{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item }}/{{ name }}">
 		AllowOverride none
