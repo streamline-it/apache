@@ -17,6 +17,19 @@
     mode: "0750"
     state: directory
 
+- name: ensure additional custom directories exist
+  when: 
+    - apache_operation == "deploy"
+    - apache_web_directories['name'] is defined
+  loop:
+    "{{ apache_web_directories }}"
+  ansible.builtin.file:
+    path: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['name'] }}"
+    owner: "{{ item['owner'] }}"
+    group: "{{ item['group'] }}"
+    mode: "{{ item['mode'] }}"
+    state: directory
+
 - name: ensure httpd file is modified
   when: apache_httpd_conf_lines[0]['line'] is defined
   loop:

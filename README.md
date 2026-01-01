@@ -77,6 +77,28 @@ apache_https_port: 443
 apache_cert_subj: "/C=US/ST=California/L=SanFrancisco/O=MyCompany/OU=IT/CN=mydomain.com"
 
 
+
+# list webpages to validate
+# this variable will be used to make sure that page can be viewed
+apache_webpage_validation:
+  - webpage_url:
+
+# This host will be used to run the uri module via the "delegate_to" attribute
+apache_validate_delegate_host:
+
+# If true additional web directories will be included in the conf file
+apache_create_web_directories: false
+
+# Used to setup additional web directories in conf file template
+apache_web_directories:
+  - name:
+    owner:
+    group:
+    mod:
+
+#Additional packages to install
+apache_custom_pkgs:
+
 #############################################
 # vars/RedHat.yml
 #############################################

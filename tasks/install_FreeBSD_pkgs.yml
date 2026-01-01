@@ -11,6 +11,16 @@
     name: "{{ apache_openssl_pkg }}"
     state: present
 
+- name: make sure custom package(s) are installed on host
+  when: apache_jail_it == false
+  loop:
+    "{{ apache_custom_pkgs }}"
+  community.general.pkgng:
+    name: "{{ item }}"
+    state: present
+
+# jails
+
 - name: make sure apache package is installed in jail
   when: apache_jail_it == true
   community.general.pkgng:
@@ -22,4 +32,14 @@
   when: apache_jail_it == true
   community.general.pkgng:
     name: "{{ apache_openssl_pkg }}"
+    jail: "{{ apache_jailname }}"
+    state: present
+
+- name: make sure custom package(s) are installed on host
+  when: apache_jail_it == true
+  loop:
+    "{{ apache_custom_pkgs }}"
+  community.general.pkgng:
+    name: "{{ item }}"
+    jail: "{{ apache_jailname }}"
     state: present

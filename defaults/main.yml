@@ -33,3 +33,17 @@ apache_webpage_validation:
 
 # This host will be used to run the uri module via the "delegate_to" attribute
 apache_validate_delegate_host:
+
+# If true additional web directories will be included in the conf file
+apache_create_web_directories: false
+
+# Used to setup additional web directories in conf file template
+apache_web_directories:
+  - name: 
+    owner:
+    group:
+    mod:
+
+# additional packages to install
+apache_custom_pkgs:
+  - 

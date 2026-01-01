@@ -11,6 +11,14 @@
 		AllowOverride none
 		Require all granted
 	</Directory>
+{% if apache_create_web_directories == true %}
+{% for item in apache_web_directories %}
+	<Directory	"{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item }}/{{ name }}">
+		AllowOverride none
+		Require all granted
+	</Directory>
+{% endfor %}
+{% endif %}
 </Virtualhost>
 {% if apache_secure_it == true %}
 <VirtualHost	{{ apache_webserver_name }}:{{ apache_https_port }}>
@@ -26,5 +34,14 @@
 		AllowOverride none
 		Require all granted
 	</Directory>
+{% if apache_create_web_directories == true %}
+{% for item in apache_web_directories %}
+	<Directory	"{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['name'] }}">
+		AllowOverride none
+		Require all granted
+	</Directory>
+{% endfor %}
+{% endif %}
+
 </Virtualhost>
 {% endif %}
