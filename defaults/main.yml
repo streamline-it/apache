@@ -46,4 +46,8 @@ apache_web_directories:
 
 # additional packages to install
 apache_custom_pkgs:
-  - 
+  -
+
+# custom directives 
+apache_custom_directives:
+  -

@@ -99,6 +99,9 @@ apache_web_directories:
 #Additional packages to install
 apache_custom_pkgs:
 
+# custome directives
+apache_custom_directives:
+  - 
 #############################################
 # vars/RedHat.yml
 #############################################

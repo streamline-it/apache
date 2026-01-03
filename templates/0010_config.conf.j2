@@ -7,6 +7,9 @@
 	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
 	#RewriteEngine on
 	#RewriteRule ^(/.*)$ https://%{HTTP_HOST}$1 [redirect=301]
+{% if len({{ apache_custom_directives }}) > 0 %}
+	{{ item }}
+{% endif %}
 	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
@@ -30,6 +33,9 @@
 	SSLCertificateFile {{ apache_cert_destination_relative_filepath }}
 	SSLCertificateKeyFile {{ apache_cert_key_destination_relative_filepath }}
 	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
+{% if len({{ apache_custom_directives }}) > 0 %}
+	{{ item }}
+{% endif %}
 	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
