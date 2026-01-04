@@ -107,6 +107,15 @@ apache_custom_directives:
 apache_custom_httpd_directives:
   -
 
+# custom files to copy to the host
+apache_custom_filelist:
+  - filename:
+    src:
+    dest_directory_name:
+    owner:
+    group:
+    mode:
+
 #############################################
 # vars/RedHat.yml
 #############################################

@@ -55,3 +55,12 @@ apache_custom_directives:
 # custom httpd directives
 apache_custom_httpd_directives:
   - 
+
+# apache_custom_filelist:
+apache_custom_filelist:
+  - filename: 
+    src:
+    dest_directory_name:
+    owner:
+    group:
+    mode: 
