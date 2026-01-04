@@ -35,7 +35,7 @@
     jail: "{{ apache_jailname }}"
     state: present
 
-- name: make sure custom package(s) are installed on host
+- name: make sure custom package(s) are installed in jail 
   when: apache_jail_it == true
   loop:
     "{{ apache_custom_pkgs }}"

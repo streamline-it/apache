@@ -20,3 +20,13 @@
     owner: root
     group: "{{ apache_group }}"
     force: true
+
+- name: ensure custom directive(s) are set for the virtual host's httpd.conf file
+  when: 
+    - ansible_custom_httpd_directives is defined
+    - ansible_os_family == "FreeBSD" and apache_operation == "deploy"
+  notify: restart webserver
+  loop:
+    "{{ apache_custom_httpd_directives }}"
+  ansible.builtin.lineinfile:
+    line: "{{ item }}"

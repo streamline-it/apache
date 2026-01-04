@@ -102,6 +102,11 @@ apache_custom_pkgs:
 # custome directives
 apache_custom_directives:
   - 
+
+# custom httpd directives
+apache_custom_httpd_directives:
+  -
+
 #############################################
 # vars/RedHat.yml
 #############################################

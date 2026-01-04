@@ -21,7 +21,6 @@
   when: 
     - apache_operation == "deploy"
     - apache_create_custom_web_directories == true
-    - apache_web_directories['name'] is defined
   loop:
     "{{ apache_web_directories }}"
   ansible.builtin.file:
@@ -70,3 +69,6 @@
 
 - name: call task to ensure webserver content is reachable
   ansible.builtin.include_tasks: "validate_webserver.yml"
+
+- name: call task to ensure needed custom files exist
+  ansible.builtin.include_tasks: "copy_custom_files.yml"

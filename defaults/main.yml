@@ -51,3 +51,7 @@ apache_custom_pkgs:
 # custom directives 
 apache_custom_directives:
   -
+
+# custom httpd directives
+apache_custom_httpd_directives:
+  - 

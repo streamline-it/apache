@@ -7,16 +7,18 @@
 	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
 	#RewriteEngine on
 	#RewriteRule ^(/.*)$ https://%{HTTP_HOST}$1 [redirect=301]
-{% if len({{ apache_custom_directives }}) > 0 %}
-	{{ item }}
+{% if apache_custom_directives | length > 0 %}
+{% for directive_item in apache_custom_directives %}
+	{{ directive_item }}
+{% endfor %}
 {% endif %}
 	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
 	</Directory>
-{% if apache_create_custom_web_directories == true %}
+{% if apache_create_custom_web_directories %}
 {% for item in apache_web_directories %}
-	<Directory	"{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item }}/{{ name }}">
+	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['name'] }}">
 		AllowOverride none
 		Require all granted
 	</Directory>
@@ -33,21 +35,23 @@
 	SSLCertificateFile {{ apache_cert_destination_relative_filepath }}
 	SSLCertificateKeyFile {{ apache_cert_key_destination_relative_filepath }}
 	DocumentRoot {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/
-{% if len({{ apache_custom_directives }}) > 0 %}
-	{{ item }}
+{% if apache_custom_directives | length > 0 %}
+{% for directive_item in apache_custom_directives %}
+	{{ directive_item }}
+{% endfor %}
 {% endif %}
 	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/html/">
 		AllowOverride none
 		Require all granted
 	</Directory>
-{% if apache_create_web_directories == true %}
+{% if apache_create_custom_web_directories %}
 {% for item in apache_web_directories %}
-	<Directory	"{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['name'] }}">
+	<Directory	"{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['name'] }}">
 		AllowOverride none
 		Require all granted
 	</Directory>
 {% endfor %}
 {% endif %}
 
-</Virtualhost>
+</VirtualHost>
 {% endif %}
