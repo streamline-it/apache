@@ -55,6 +55,7 @@
   loop:
     "{{ apache_custom_filelist }}"
   ansible.builtin.shell: 
+    creates: "{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}/{{ item['filename'] }}"
     cmd: "$(which jexec) -lU root {{ apache_jailname }} chgrp {{ item['group'] }} {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}/{{ item['filename'] }}" 
 
 - name: ensure proper group has been assigned to custom directory(s) in the jail
@@ -62,4 +63,5 @@
   loop:
     "{{ apache_custom_filelist }}"
   ansible.builtin.shell: 
+    creates: "{{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}/{{ item['filename'] }}"
     cmd: "$(which jexec) -lU root {{ apache_jailname }} chgrp {{ item['group'] }} {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}" 
