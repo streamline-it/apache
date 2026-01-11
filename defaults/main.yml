@@ -56,11 +56,14 @@ apache_custom_directives:
 apache_custom_httpd_directives:
   - 
 
+# tells role that custom file list is being used
+apache_custom_filelist_defined: false
+
 # apache_custom_filelist:
 apache_custom_filelist:
   - filename: 
-    src:
-    dest_directory_name:
-    owner:
-    group:
+    src: 
+    dest_directory_name: 
+    owner: 
+    group: 
     mode: 

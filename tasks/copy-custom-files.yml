@@ -1,22 +1,65 @@
 ---
-- name: ensure each directory is created under the virtual hosts's directory
-  when: apache_custom_filelist[0]['filename'] != ""
+- name: ensure each directory is created under the virtual hosts's directory (host)
+  debugger: on_failed
+  when: 
+    - apache_jail_it == false
+    - apache_custom_filelist_defined 
   loop:
     "{{ apache_custom_filelist }}"
   ansible.builtin.file:
     path: "{{ apache_virtual_hosts_directory }}/{{ item['dest_directory_name'] }}"
     owner: "{{ item['owner'] }}"
     group: "{{ item['group'] }}"
-    mode: "{{ item['mode'] }}"   
+    mode: "0750"   
     state: directory
 
-- name: ensure custom files exist
-  when: apache_custom_filelist[0]['filename'] != ""
+- name: ensure each directory is created under the virtual hosts's directory (jail)
+  when: 
+    - apache_jail_it
+    - apache_custom_filelist_defined 
+  loop:
+    "{{ apache_custom_filelist }}"
+  ansible.builtin.file:
+    path: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}"
+    owner: "{{ item['owner'] }}"
+    mode: "0750"   
+    state: directory
+
+- name: ensure custom files exist (host)
+  when: 
+    - apache_jail_it == false
+    - apache_custom_filelist_defined
   loop:
     "{{ apache_custom_filelist }}"
   ansible.builtin.copy:
     src:  "{{ item['filename'] }}"
-    dest: "{{ apache_virtual_hosts_directory }}/{{ item['dest_directory_name'] }}"
+    dest: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}"
     owner: "{{ item['owner'] }}"
     group: "{{ item['group'] }}"
     mode: "{{ item['mode'] }}"
+
+- name: ensure custom files exist (jail)
+  when: 
+    - apache_jail_it == true
+    - apache_custom_filelist_defined
+  loop:
+    "{{ apache_custom_filelist }}"
+  ansible.builtin.copy:
+    src:  "{{ item['filename'] }}"
+    dest: "{{ apache_virtual_hosts_directory }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}"
+    owner: "{{ item['owner'] }}"
+    mode: "{{ item['mode'] }}"
+
+- name: ensure proper group has been assigned to custom file(s) in the jail
+  when: apache_jail_it == true
+  loop:
+    "{{ apache_custom_filelist }}"
+  ansible.builtin.shell: 
+    cmd: "$(which jexec) -lU root {{ apache_jailname }} chgrp {{ item['group'] }} {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}/{{ item['filename'] }}" 
+
+- name: ensure proper group has been assigned to custom directory(s) in the jail
+  when: apache_jail_it == true
+  loop:
+    "{{ apache_custom_filelist }}"
+  ansible.builtin.shell: 
+    cmd: "$(which jexec) -lU root {{ apache_jailname }} chgrp {{ item['group'] }} {{ apache_virtual_hosts_directory_relative }}/{{ apache_webserver_name }}/{{ item['dest_directory_name'] }}" 
