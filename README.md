@@ -24,6 +24,7 @@ None
 Example Playbook
 ----------------
 
+
 name: Deploy an Apache Web Server
 hosts: node2.example.com
 tasks:
