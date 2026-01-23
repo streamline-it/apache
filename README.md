@@ -10,47 +10,13 @@ None
 
 Role Variables
 --------------
-# Contols operation of Apache
-# "deploy" - Will setup  a webserver; install packages and configure a virtual webserver
-# "restart" - Will restart the Apache service
-apache_operation: deploy
 
+*********************************************************************
+    
+    defaults section
 
-Dependencies
-------------
-
-None
-
-Example Playbook
-----------------
-
-
-name: Deploy an Apache Web Server
-hosts: node2.example.com
-tasks:
-  - name: call role to deploy apache web server
-      ansible.builtin.import_role:
-        name: apache
-      vars:
-        apache_operation: deploy
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-Rich O'Hara
-streamline.it.gh@gmail.com
-
-#############################################
-# Defaults
-#############################################
-# Values for this variable:
-# "deploy"  deploy the webserver
-# "restart" restart the service
+*********************************************************************
+# Values: deploy (Setup Apache) resart (restart apache)
 apache_operation: deploy
 
 # name of the webserver virtual host
@@ -59,16 +25,18 @@ apache_webserver_name: int_webserver
 # If true SSL will be enabled
 apache_secure_it: true
 
-# main web host, used to set the main host's certification filename etc
+# main web host, used to set the main host's certificate filename etc
 apache_main_hostname: 
 
+# for FreeBSD will address apache running directly on the host or in a jail
 apache_jail_it: false
 
 # leave next two variables blank unless installing in jail
 apache_jailname: 
 
 # path to pre-pend to the inside jail path.  Leave blank if not configuring
-# a jail
+# a jail.  For example if jails on the host exist under "/jails" folder, the
+# prepath would be set to "/jails".
 apache_jail_prepath:
 
 apache_http_port: 80
@@ -77,49 +45,114 @@ apache_https_port: 443
 # Used to create the certificates
 apache_cert_subj: "/C=US/ST=California/L=SanFrancisco/O=MyCompany/OU=IT/CN=mydomain.com"
 
-
-
-# list webpages to validate
-# this variable will be used to make sure that page can be viewed
+# list webpages to validate 
+# this variable will be used to make sure that page can be viewed by a validation task
 apache_webpage_validation:
   - webpage_url:
 
-# This host will be used to run the uri module via the "delegate_to" attribute
+# This host will be used to run the uri module via the "delegate_to" attribute to validate the web pages
+# from the "apache_webpage_validation variable
 apache_validate_delegate_host:
 
 # If true additional web directories will be included in the conf file
-apache_create_custom_web_directories: false
+# Useful for incuding additional webdirectories to host additional webpages
+apache_custom_create_web_directories: false
 
 # Used to setup additional web directories in conf file template
 apache_web_directories:
-  - name:
+  - name: 
     owner:
     group:
     mod:
 
-#Additional packages to install
+# additional packages to install
 apache_custom_pkgs:
-
-# custome directives
-apache_custom_directives:
-  - 
-
-# custom httpd directives
-apache_custom_httpd_directives:
   -
 
-# custom files to copy to the host
-apache_custom_filelist:
-  - filename:
-    src:
-    dest_directory_name:
-    owner:
-    group:
-    mode:
+# custom directives for example if using WSGI
+# you could include WSGIScriptAlias directive here.
+# you can include multiple lines as this is a list 
+# These will exist under the virtual host's
+# config
+apache_custom_directives:
+  -
 
-#############################################
-# vars/RedHat.yml
-#############################################
+# custom httpd directives, these will appear
+# under the main httpd.conf file, not the copy
+# for the virual host
+apache_custom_httpd_directives:
+  - 
+
+# tells role if the custom file list is being used
+apache_custom_filelist_defined: false
+
+# Will copy any file(s) to the location
+# specified.  Useful for CGI WSGI scripts
+# data text files, pics etc
+apache_custom_filelist:
+  - filename: 
+    src: 
+    dest_directory_name: 
+    owner: 
+    group: 
+    mode: 
+
+*********************************************************************
+
+    vars
+
+*********************************************************************
+
+                        FreeBSD vars
+
+# Used to enable service in the rc.conf file
+apache_enable_directive: apache24_enable="yes"
+
+# used for root user under FreeBSD
+apache_root_group: wheel
+
+# used for the group for apache
+apache_group: www
+apache_pkg: apache24
+apache_openssl_pkg: openssl
+
+# needed for the service "start" 
+apache_svc: apache24
+
+# All "relative" variables contain the "inside jail" path that usually is used for
+# config lines.  If not running the webserver from a jail, make the relative value
+# the same as the variable above it.
+apache_virtual_hosts_directory: "{{ apache_jail_prepath }}/usr/local/www/virtual_hosts"
+apache_virtual_hosts_directory_relative: "/usr/local/www/virtual_hosts"
+apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/
+apache_virtual_hosts_webcontent_directory: "{{ apache_jail_prepath }}/var/www/virtual_hosts/{{ apache_webserver_name }}/data"
+apache_virtual_hosts_webcontent_directory_relative: "/usr/local/www/virtual_hosts/{{ apache_webserver_name }}/data"
+apache_default_webcontent_directory: "{{ apache_jail_prepath }}/usr/local/www/apache24/data/"
+apache_default_webcontent_directory_relative: "/usr/local/www/apache24/data/"
+apache_config_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
+apache_config_base_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24"
+apache_config_virt_hosts_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
+apache_cert_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+apache_cert_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+apache_cert_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
+apache_cert_key_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
+
+# used to create the certificates and cert keys
+apache_create_cert_commands:
+  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt -days 365 -nodes -subj '{{ apache_cert_subj}}'"
+    certfile: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
+  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.crt -days 365 -nodes -subj '{{ apache_main_host_subj}}'"
+    certfile: "/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"
+
+# used to add needed directives to the httpd.conf file in order to enable Rewrite and Secure SSL connections
+apache_httpd_conf_lines:
+  - line: LoadModule ssl_module libexec/apache24/mod_ssl.so
+  - line: LoadModule socache_shmcb_module libexec/apache24/mod_socache_shmcb.so
+  - line: LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+  - line: LoadModule vhost_alias_module libexec/apache24/mod_vhost_alias.so
+  - line: Include etc/apache24/extra/httpd-ssl.conf
+
+                                RedHat vars
 
 apache_pkg: "@Basic Web Server"
 apache_svc: httpd
@@ -162,60 +195,30 @@ apache_httpd_conf_lines:
   - line:
 
 
-#############################################
-# vars/FreeBSD.vars
-#############################################
+Dependencies
+------------
 
-# Used to enable service in the rc.conf file
-apache_enable_directive: apache24_enable="yes"
-# used for root user under FreeBSD
-apache_root_group: wheel
+None
 
-# used for the group for apache
-apache_group: www
-apache_pkg: apache24
-apache_openssl_pkg: openssl
+Example Playbook
+----------------
 
-# needed for the service "start" 
-apache_svc: apache24
+name: Deploy an Apache Web Server
+hosts: node2.example.com
+tasks:
+  - name: call role to deploy apache web server
+      ansible.builtin.import_role:
+        name: apache
+      vars:
+        apache_operation: deploy
 
-# All "relative" variables contain the "inside jail" path that usually is used for
-# config lines.  If not running the webserver from a jail, make the relative value
-# the save as the variable above it.
-apache_virtual_hosts_directory: "{{ apache_jail_prepath }}/usr/local/www/virtual_hosts"
-apache_virtual_hosts_directory_relative: "/usr/local/www/virtual_hosts"
-apache_host_webcontent_directory_relative: /usr/local/www/apache24/data/
-apache_virtual_hosts_webcontent_directory: "{{ apache_jail_prepath }}/var/www/virtual_hosts/{{ apache_webserver_name }}/data"
-apache_virtual_hosts_webcontent_directory_relative: "/usr/local/www/virtual_hosts/{{ apache_webserver_name }}/data"
-apache_default_webcontent_directory: "{{ apache_jail_prepath }}/usr/local/www/apache24/data/"
-apache_default_webcontent_directory_relative: "/usr/local/www/apache24/data/"
-apache_config_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
-apache_config_base_directory: "{{ apache_jail_prepath }}/usr/local/etc/apache24"
-apache_config_virt_hosts_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/Includes"
-apache_cert_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
-apache_cert_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
-apache_cert_key_destination_filepath: "{{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
-apache_cert_key_destination_relative_filepath: "/usr/local/etc/apache24/{{ apache_webserver_name }}.key"
+License
+-------
 
-# used to create the certificates and cert keys
-apache_create_cert_commands:
-  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_webserver_name }}.crt -days 365 -nodes -subj '{{ apache_cert_subj}}'"
-    certfile: "/usr/local/etc/apache24/{{ apache_webserver_name }}.crt"
-  - command: "openssl req -x509 -newkey rsa:2048 -keyout {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.key -out {{ apache_jail_prepath }}/usr/local/etc/apache24/{{ apache_main_hostname }}.crt -days 365 -nodes -subj '{{ apache_main_host_subj}}'"
-    certfile: "/usr/local/etc/apache24/{{ apache_main_hostname }}.crt"
+BSD
 
-# used to add needed directives to the httpd.conf file in order to enable Rewrite and Secure SSL connections
-apache_httpd_conf_lines:
-  - line: LoadModule ssl_module libexec/apache24/mod_ssl.so
-  - line: LoadModule socache_shmcb_module libexec/apache24/mod_socache_shmcb.so
-  - line: LoadModule rewrite_module libexec/apache24/mod_rewrite.so
-  - line: LoadModule vhost_alias_module libexec/apache24/mod_vhost_alias.so
-  - line: Include etc/apache24/extra/httpd-ssl.conf
+Author Information
+------------------
 
-# list webpages to validate 
-# this variable will be used to make sure that page can be viewed 
-apache_webpage_validation:
-  - webpage_url:
-
-# This host will be used to run the uri module via the "delegate_to" attribute
-apache_validate_delegate_host:
+Rich O'Hara
+streamline.it.gh@gmail.com
