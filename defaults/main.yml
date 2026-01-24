@@ -36,7 +36,7 @@ apache_webpage_validation:
 apache_validate_delegate_host:
 
 # If true additional web directories will be included in the conf file
-apache_custom_create_web_directories: false
+apache_create_custom_web_directories: false
 
 # Used to setup additional web directories in conf file template
 apache_web_directories:

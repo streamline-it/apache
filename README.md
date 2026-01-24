@@ -56,7 +56,7 @@ apache_validate_delegate_host:
 
 # If true additional web directories will be included in the conf file
 # Useful for incuding additional webdirectories to host additional webpages
-apache_custom_create_web_directories: false
+apache_create_custom_web_directories: false
 
 # Used to setup additional web directories in conf file template
 apache_web_directories:
@@ -203,14 +203,35 @@ None
 Example Playbook
 ----------------
 
-name: Deploy an Apache Web Server
-hosts: node2.example.com
-tasks:
-  - name: call role to deploy apache web server
+Simple config-
+
+Example of a simple webserver no security (not SSL enabled security)
+
+- name: Deploy an Apache Web Server
+  hosts: node2.example.com
+
+  tasks:
+    - name: call role to deploy apache web server
       ansible.builtin.import_role:
         name: apache
       vars:
         apache_operation: deploy
+        apache_webserver_name: node6-virtual-webserver
+        apache_main_hostname: node6.rocky93.example.com
+        apache_secure_it: false
+        apache_jail_it: false
+        apache_cert_subj: '/C=US/ST=NewJersey/L=OldBridge/O=streamlineIT/OU=IT/CN={{ apache_webser    ver_name }}'
+        apache_main_host_subj: '/C=US/ST=NewJersey/L=OldBridge/O=streamlineIT/OU=IT/CN={{ apache_m    ain_hostname }}'
+        apache_validate_delegate_host: walter.example.com
+        apache_webpage_validation:
+          - webpage_url: "http://{{ apache_main_hostname }}"
+
+-----------------------------------------------------------------------------
+Server using SSL Security
+
+
+-----------------------------------------------------------------------------
+Server using SSL Security and a FreeBSD jail
 
 License
 -------
