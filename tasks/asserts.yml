@@ -40,10 +40,9 @@
       - apache_root_group is defined
       - apache_group is defined
       - apache_pkg is defined
-      - apache_openssl_pkg is defined
       - apache_svc is defined
-      - apache_virtual_host_directory is defined
-      - apache_virtual_host_directory_relative is defined
+      - apache_virtual_hosts_directory is defined
+      - apache_virtual_hosts_directory_relative is defined
       - apache_host_webcontent_directory_relative is defined
       - apache_virtual_hosts_webcontent_directory is defined
       - apache_virtual_hosts_webcontent_directory_relative is defined
@@ -51,13 +50,21 @@
       - apache_default_webcontent_directory_relative is defined
       - apache_config_directory is defined
       - apache_config_base_directory is defined
-      - apache_virt_hosts_filepath is defined
+      - apache_config_virt_hosts_filepath is defined
       - apache_cert_destination_filepath is defined
       - apache_cert_destination_relative_filepath is defined
       - apache_cert_key_destination_filepath is defined
       - apache_cert_key_destination_relative_filepath is defined
       - apache_create_cert_commands is defined
       - apache_httpd_conf_lines is defined
+
+- name: check on apache_openssl_pkg if running on FreeBSD host
+  when: ansible_os_family == "FreeBSD"
+  ansible.builtin.assert:
+    that:
+      - apache_openssl_pkg is defined
+      - apache_openssl_pkg | length > 0
+    fail_msg: "Make sure to define apache_openssl_pkg"
 
 - name: ensure that if using a jail that the jail's prepath variable is defined
   when: apache_jail_it == true
