@@ -1,0 +1,72 @@
+---
+- name: Check on defaults variables
+  ansible.builtin.assert:
+    that:
+      - apache_operation is defined
+      - apache_operation == "deploy" or apache_operation == "restart"
+      - apache_webserver_name is defined
+      - apache_webserver_name | length > 0
+      - apache_secure_it is defined
+      - apache_main_hostname is defined
+      - apache_main_hostname | length > 0
+      - apache_jail_it is defined
+      - apache_jail_prepath is defined
+      - apache_http_port is defined
+      - apache_cert_subj is defined
+      - apache_webpage_validation is defined
+      - apache_custom_create_web_directories is defined
+      - apache_custom_pkgs is defined
+      - apache_custom_directives is defined
+      - apache_custom_httpd_directives is defined
+      - apache_custom_filelist_defined is defined
+      - apache_custom_filelist is defined
+    fail_msg: |
+      "The was an issue with one of the following variables either not being
+      defined or in the case of apache_operation having an invalid value, 
+      here's the list of variables being checked apache_operation 
+      apache_operation, apache_webserver_name, apache_webserver_name 
+      ,apache_secure_it, apache_secure_it, apache_main_hostname, 
+      apache_main_hostname, apache_jail_it, apache_jail_prepath,
+      apache_http_port, apache_cert_subj, 
+      apache_webpage_validation, apache_custom_create_web_directories, 
+      apache_custom_pkgs, apache_custom_directives, 
+      apache_custom_httpd_directives, apache_custom_filelist_defined 
+      apache_custom_filelist"
+
+- name: Check on vars variables
+  ansible.builtin.assert:
+    that:
+      - apache_enable_directive is defined
+      - apache_root_group is defined
+      - apache_group is defined
+      - apache_pkg is defined
+      - apache_openssl_pkg is defined
+      - apache_svc is defined
+      - apache_virtual_host_directory is defined
+      - apache_virtual_host_directory_relative is defined
+      - apache_host_webcontent_directory_relative is defined
+      - apache_virtual_hosts_webcontent_directory is defined
+      - apache_virtual_hosts_webcontent_directory_relative is defined
+      - apache_default_webcontent_directory is defined
+      - apache_default_webcontent_directory_relative is defined
+      - apache_config_directory is defined
+      - apache_config_base_directory is defined
+      - apache_virt_hosts_filepath is defined
+      - apache_cert_destination_filepath is defined
+      - apache_cert_destination_relative_filepath is defined
+      - apache_cert_key_destination_filepath is defined
+      - apache_cert_key_destination_relative_filepath is defined
+      - apache_create_cert_commands is defined
+      - apache_httpd_conf_lines is defined
+
+- name: ensure that if using a jail that the jail's prepath variable is defined
+  when: apache_jail_it == true
+  ansible.builtin.assert:
+    that: apache_jail_prepath | length > 0
+    fail_msg: "When setting apache_jail_it to true you must define the apache_jail_prepath variable"
+
+- name: ensure that if using a jail that the jail's prepath variable is defined
+  when: apache_secure_it == true
+  ansible.builtin.assert:
+    that: apache_cert_subj | length > 0
+    fail_msg: "When setting apache_secure_it to true, you must define the apache_cert_subj variable"

@@ -1,5 +1,6 @@
 ---
 # defaults file for apache
+# values should be "deploy" or "restart"
 apache_operation: deploy
 
 # name of the webserver virtual host
