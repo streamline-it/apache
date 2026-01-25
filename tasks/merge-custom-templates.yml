@@ -1,0 +1,10 @@
+---
+- name: ensure custom templates get merged to the web host
+  loop:
+    "{{ apache_custom_templates }}"
+  ansible.builtin.template:
+    src: "{{ item['template_source'] }}"
+    dest: "{{ item['file_dest_path'] }}/{{ item['template_dest_filename'] }}"
+    owner: "{{ item['file_owner'] }}"
+    group: "{{ item['file_group'] }}"
+    mode: "{{ item['file_mode'] }}"

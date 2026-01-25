@@ -97,6 +97,22 @@ apache_custom_filelist:
     group: 
     mode: 
 
+# Next variables give ability for custom templates
+# to be deployed
+
+# if true custome templates will be merged
+apache_use_custom_templates: false
+
+# holds source and destination info for template
+apache_custom_templates:
+  - template_source:
+    template_dest_filename:
+    file_dest_path:
+    file_owner:
+    file_group:
+    file_mode:
+
+
 *********************************************************************
 
     vars

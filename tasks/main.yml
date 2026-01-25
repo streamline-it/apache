@@ -75,3 +75,7 @@
 
 - name: call task to ensure needed custom files exist
   ansible.builtin.include_tasks: "copy-custom-files.yml"
+
+- name: call tasks to ensure custom templates exist
+  when: apache_use_custom_templates == true
+  ansible.builtin.include_tasks: "merge-custom-templates.yml"
