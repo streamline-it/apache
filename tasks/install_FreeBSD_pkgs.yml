@@ -12,7 +12,9 @@
     state: present
 
 - name: make sure custom package(s) are installed on host
-  when: apache_jail_it == false
+  when: 
+    - apache_jail_it == false
+    - apache_custom_pkgs | length > 0
   loop:
     "{{ apache_custom_pkgs }}"
   community.general.pkgng:
@@ -36,7 +38,9 @@
     state: present
 
 - name: make sure custom package(s) are installed in jail 
-  when: apache_jail_it == true
+  when: 
+    - apache_jail_it == true
+    - apache_custom_pkgs | length > 0
   loop:
     "{{ apache_custom_pkgs }}"
   community.general.pkgng:

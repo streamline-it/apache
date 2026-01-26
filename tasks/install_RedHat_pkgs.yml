@@ -9,8 +9,34 @@
 
 - name: make sure apache package is installed (via yum)
   ansible.builtin.yum:
-    name: "{{ aoache_pkg}}"
+    name: "{{ apache_pkg}}"
     update_cache: true
     state: latest
   when: ansible_distribution_major_version == "6"
         or ansible_distribution_major_version == "7"
+
+# install custom packages
+
+- name: make sure custom package(s) are installed (via dnf)
+  debugger: on_failed
+  when: apache_custom_pkgs | length > 0  and
+        (ansible_distribution_major_version == "8")
+        or ansible_distribution_major_version == "9"
+  loop:
+    "{{ apache_custom_pkgs }}"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    update_cache: true
+    state: latest
+
+- name: make sure custom package(s) are installed (via yum)
+  when: apache_custom_pkgs | length > 0  and
+        (ansible_distribution_major_version == "6"
+        or ansible_distribution_major_version == "7")
+  loop:
+    "{{ apache_custom_pkgs }}"
+  ansible.builtin.yum:
+    name: "{{ apache_pkg}}"
+    update_cache: true
+    state: latest
+

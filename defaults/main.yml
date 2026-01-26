@@ -46,16 +46,14 @@ apache_web_directories:
     mod:
 
 # additional packages to install
-apache_custom_pkgs:
-  -
+apache_custom_pkgs: []
 
-# custom directives 
+# custom directives for the virtual host's config
 apache_custom_directives:
-  -
+  - 
 
 # custom httpd directives
-apache_custom_httpd_directives:
-  - 
+apache_custom_httpd_directives: []
 
 # tells role that custom file list is being used
 apache_custom_filelist_defined: false

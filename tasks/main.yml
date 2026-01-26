@@ -42,6 +42,15 @@
     line: "{{ item['line'] }}"
     state: present
 
+- name: ensure httpd file is modified for custom directive(s)
+  when: apache_custom_httpd_directives | length > 0
+  loop:
+    "{{ apache_custom_httpd_directives }}"
+  ansible.builtin.lineinfile:
+    path: "{{ apache_config_base_directory }}/httpd.conf"
+    line: "{{ item }}"
+    state: present
+
 - name: call tasks to make sure web content exists
   when: apache_operation == "deploy"
   ansible.builtin.include_tasks: "./tasks/deploy_web_content.yml"
@@ -62,6 +71,13 @@
   when: apache_operation == "deploy"
   ansible.builtin.include_tasks: "./tasks/deploy_virtual_hosts_config.yml"
 
+- name: call task to ensure needed custom files exist
+  ansible.builtin.include_tasks: "copy-custom-files.yml"
+
+- name: call tasks to ensure custom templates exist
+  when: apache_use_custom_templates == true
+  ansible.builtin.include_tasks: "merge-custom-templates.yml"
+
 - name: call tasks make sure needed services are enabled/started
   ansible.builtin.include_tasks: "./tasks/start_{{ ansible_os_family }}_svc.yml"
   when: apache_operation == "deploy"
@@ -72,10 +88,3 @@
 
 - name: call task to ensure webserver content is reachable
   ansible.builtin.include_tasks: "validate_webserver.yml"
-
-- name: call task to ensure needed custom files exist
-  ansible.builtin.include_tasks: "copy-custom-files.yml"
-
-- name: call tasks to ensure custom templates exist
-  when: apache_use_custom_templates == true
-  ansible.builtin.include_tasks: "merge-custom-templates.yml"

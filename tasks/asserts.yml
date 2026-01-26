@@ -21,6 +21,8 @@
       - apache_custom_httpd_directives is defined
       - apache_custom_filelist_defined is defined
       - apache_custom_filelist is defined
+      - apache_use_custom_templates is defined
+      - apache_custom_templates is defined
     fail_msg: |
       "The was an issue with one of the following variables either not being
       defined or in the case of apache_operation having an invalid value, 
@@ -81,3 +83,10 @@
       - apache_cert_subj | length > 0
       - apache_main_host_subj | length > 0
     fail_msg: "When setting apache_secure_it to true, you must define the apache_cert_subj variable and apache_main_host_subj"
+
+- name: ensure optional templating variables are set
+  when: apache_use_custom_templates == true
+  ansible.builtin.assert:
+    that:
+      - apache_custom_templates[0]['template_source'] | length > 0
+    fail_msg: "When using custom templating, you must define the apache_custom_templates variable."
