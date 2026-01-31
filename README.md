@@ -211,6 +211,12 @@ apache_httpd_conf_lines:
   - line:
 
 
+# The following variable only needs to be used by RHEL hosts,
+# ncat is installed with FreeBSD userland
+# It's needed by the validate web page task to check to see
+# if the firewall allows web traffic
+apache_ncat_pkg: nmap-ncat
+
 Dependencies
 ------------
 

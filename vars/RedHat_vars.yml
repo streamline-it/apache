@@ -38,3 +38,6 @@ apache_create_cert_commands:
 # mods to the the httpd.conf file
 apache_httpd_conf_lines:
   - line:
+
+# package needed for web page validation
+apache_ncat_pkg: nmap-ncat

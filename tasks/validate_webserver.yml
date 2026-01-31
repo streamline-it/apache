@@ -1,10 +1,30 @@
 ---
-- name: validate targeted webpages
-  when: apache_webpage_validation is defined
+- name: ensure cat is available on RHEL hosts
+  when: ansible_os_family == "RedHat"
+  ansible.builtin.package:
+    name: "{{ apache_ncat_pkg }}"
+    state: present
+
+- name: make sure web traffic is allowed through the firewall
+  register: apache_webtraffic_check
+  ignore_errors: true
+  changed_when: false
+  ansible.builtin.command: "nc -vzw 2 {{ apache_webserver_name }} 80"
+
+- name: validate targeted webpages if the firewall allows web traffic
+  when: 
+    - apache_webtraffic_check['rc'] == 0
+    - apache_webpage_validation is defined
   delegate_to: "{{ apache_validate_delegate_host }}"
   loop:
     "{{ apache_webpage_validation }}"
+  changed_when: false
   ansible.builtin.uri:
     url: "{{ item['webpage_url'] }}"
     validate_certs: false
     status_code: 200
+
+- name: let user know we couldn't validate webpage due to firewall issue
+  when: apache_webtraffic_check['rc'] > 0
+  ansible.builtin.debug:
+    msg: "Unable to validate web page(s) due to firewall not allowing web traffic or some other issue"

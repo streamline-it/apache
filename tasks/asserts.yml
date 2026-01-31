@@ -90,3 +90,9 @@
     that:
       - apache_custom_templates[0]['template_source'] | length > 0
     fail_msg: "When using custom templating, you must define the apache_custom_templates variable."
+
+- name: ensure apache_ncat_pkg exists if dealing with RHEL host
+  when: ansible_os_family == "RedHat"
+  ansible.builtin.assert:
+    that: apache_ncat_pkg is defined
+    fail_msg: "Make sure the apache_ncat_pkg is defined"
