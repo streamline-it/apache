@@ -1,5 +1,6 @@
 ---
 - name: Check on defaults variables
+  debugger: on_failed
   ansible.builtin.assert:
     that:
       - apache_operation is defined
@@ -22,7 +23,6 @@
       - apache_custom_filelist_defined is defined
       - apache_custom_filelist is defined
       - apache_use_custom_templates is defined
-      - apache_custom_templates is defined
     fail_msg: |
       "The was an issue with one of the following variables either not being
       defined or in the case of apache_operation having an invalid value, 
@@ -35,7 +35,14 @@
       apache_create_custom_web_directories, 
       apache_custom_pkgs, apache_custom_directives, 
       apache_custom_httpd_directives, apache_custom_filelist_defined 
-      apache_custom_filelist"
+      apache_custom_filelist, apache_use_custom_templates"
+
+- name: if using custom templates, make sure custom template variable is defined
+  when: apache_use_custom_templates == true
+  ansible.builtin.assert:
+    that:
+      - apache_custom_templates is defined
+    fail_msg: "You must define apache_custom_templates variable"
 
 - name: Check on vars variables
   ansible.builtin.assert:
