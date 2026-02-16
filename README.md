@@ -228,9 +228,11 @@ Example Playbook
 Simple config-
 
 Example of a simple webserver no security (not SSL enabled security)
+* be aware for the apache_cert_subj and apache_main_host_subj variables, replace the items between <> with your appropriate values.
 
-- name: Deploy an Apache Web Server
-  hosts: node2.example.com
+- name: test for apache role
+  hosts: node5.rocky93.example.com
+  become: true
 
   tasks:
     - name: call role to deploy apache web server
@@ -238,15 +240,17 @@ Example of a simple webserver no security (not SSL enabled security)
         name: apache
       vars:
         apache_operation: deploy
-        apache_webserver_name: node6-virtual-webserver
-        apache_main_hostname: node6.rocky93.example.com
+        apache_webserver_name: node5_webserver
+        apache_main_hostname: node5.rocky93.example.com
         apache_secure_it: false
         apache_jail_it: false
-        apache_cert_subj: '/C=US/ST=NewJersey/L=OldBridge/O=streamlineIT/OU=IT/CN={{ apache_webser    ver_name }}'
-        apache_main_host_subj: '/C=US/ST=NewJersey/L=OldBridge/O=streamlineIT/OU=IT/CN={{ apache_m    ain_hostname }}'
+        apache_cert_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_webserver_name }}'
+        apache_main_host_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_main_hostname }}'
         apache_validate_delegate_host: walter.example.com
         apache_webpage_validation:
           - webpage_url: "http://{{ apache_main_hostname }}"
+
+
 
 -----------------------------------------------------------------------------
 Server using SSL Security
