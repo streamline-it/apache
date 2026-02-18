@@ -1,7 +1,14 @@
-Role Name
-=========
-
+Role Name =========
 This will deploy an Apache Web server.  It also will restart the service.
+You can use this role to deploy a insucure/secure server.  Also if working with a FreeBSD host, you can configure apache in a jail.  In addition you can have this role install packages you provide in a list. Also provides you with the ability to configure multiple directory/web pages to serve applications for instance.  In these additional directories that you provide in a list, you can copy files to those directories.  For example a directory to hold image files.
+
+Examples have been included to show how to provide for the following applications:
+
+Insecure web server
+
+Secure web server
+
+Secure web server running in a Jail
 
 Requirements
 ------------
@@ -228,7 +235,6 @@ Example Playbook
 Simple config-
 
 Example of a simple webserver no security (not SSL enabled security)
-* be aware for the apache_cert_subj and apache_main_host_subj variables, replace the items between <> with your appropriate values.
 
 - name: test for apache role
   hosts: node5.rocky93.example.com
@@ -244,8 +250,6 @@ Example of a simple webserver no security (not SSL enabled security)
         apache_main_hostname: node5.rocky93.example.com
         apache_secure_it: false
         apache_jail_it: false
-        apache_cert_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_webserver_name }}'
-        apache_main_host_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_main_hostname }}'
         apache_validate_delegate_host: walter.example.com
         apache_webpage_validation:
           - webpage_url: "http://{{ apache_main_hostname }}"
@@ -255,9 +259,58 @@ Example of a simple webserver no security (not SSL enabled security)
 -----------------------------------------------------------------------------
 Server using SSL Security
 
+* be aware for the apache_cert_subj and apache_main_host_subj variables, replace the items between <> with your appropriate values.
+
+- name: test for apache role
+  hosts: node5.rocky93.example.com
+  become: true
+
+  tasks:
+    - name: call role to deploy apache web server
+      ansible.builtin.import_role:
+        name: apache
+      vars:
+        apache_operation: deploy
+        apache_webserver_name: node5_webserver
+        apache_main_hostname: node5.rocky93.example.com
+        apache_secure_it: true
+        apache_jail_it: false
+        apache_cert_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_webserver_name }}'
+        apache_main_host_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_main_hostname }}'
+        apache_validate_delegate_host: walter.example.com
+        apache_webpage_validation:
+          - webpage_url: "http://{{ apache_main_hostname }}"
 
 -----------------------------------------------------------------------------
 Server using SSL Security and a FreeBSD jail
+
+* be aware for the apache_cert_subj and apache_main_host_subj variables, replace the items between <> with your appropriate values.
+
+- name: test for apache role
+  hosts: node5.rocky93.example.com
+  become: true
+
+  tasks:
+    - name: call role to deploy apache web server
+      ansible.builtin.import_role:
+        name: apache
+      vars:
+        apache_operation: deploy
+        apache_webserver_name: node5_webserver
+        apache_main_hostname: node5.rocky93.example.com
+        apache_secure_it: true
+        apache_jail_it: true
+	apache_jail_name: node5-virtualhost
+	apache_jail_prepath: /jails/node5-virtualhost
+
+        apache_cert_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_webserver_name }}'
+        apache_main_host_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_main_hostname }}'
+
+        apache_validate_delegate_host: walter.example.com
+        apache_webpage_validation:
+          - webpage_url: "http://{{ apache_main_hostname }}"
+
+
 
 License
 -------
