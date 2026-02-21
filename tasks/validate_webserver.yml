@@ -1,15 +1,17 @@
 ---
 - name: ensure cat is available on RHEL hosts
+  delegate_to: "{{ apache_validate_delegate_host }}"
   when: ansible_os_family == "RedHat"
   ansible.builtin.package:
     name: "{{ apache_ncat_pkg }}"
     state: present
 
 - name: make sure web traffic is allowed through the firewall
+  delegate_to: "{{ apache_validate_delegate_host }}"
   register: apache_webtraffic_check
   ignore_errors: true
   changed_when: false
-  ansible.builtin.command: "nc -vzw 2 {{ apache_webserver_name }} 80"
+  ansible.builtin.command: "nc -4vzw 2 {{ apache_webserver_name }} 80"
 
 - name: validate targeted webpages if the firewall allows web traffic
   when: 

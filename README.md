@@ -296,20 +296,19 @@ Server using SSL Security and a FreeBSD jail
         name: apache
       vars:
         apache_operation: deploy
-        apache_webserver_name: node5_webserver
-        apache_main_hostname: node5.rocky93.example.com
+        my_webserver_jail_name: node8-webjail.example.com
+        apache_webserver_name: "{{ my_webserver_jail_name }}"
+        apache_main_hostname: node8.freebsd13.example.com
         apache_secure_it: true
         apache_jail_it: true
-	apache_jail_name: node5-virtualhost
-	apache_jail_prepath: /jails/node5-virtualhost
-
+        apache_jailname: node8-webjail
+        apache_jail_prepath: "/jails/{{ apache_jailname }}"
         apache_cert_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_webserver_name }}'
         apache_main_host_subj: '/C=US/ST=<your state>/L=<your city>/O=<your org>/OU=IT/CN={{ apache_main_hostname }}'
 
         apache_validate_delegate_host: walter.example.com
         apache_webpage_validation:
-          - webpage_url: "http://{{ apache_main_hostname }}"
-
+          - webpage_url: "https://{{ apache_main_hostname }}"
 
 
 License
